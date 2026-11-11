@@ -37,7 +37,9 @@ export default async function PaginaNovaConta({
         </p>
       )}
 
+      {/* A chave muda a cada conta salva, para o formulário recomeçar vazio. */}
       <FormularioConta
+        key={typeof salva === "string" ? salva : "novo"}
         vencimentoInicial={vencimentoInicial}
         categorias={categorias.data ?? []}
         favorecidos={(favorecidos.data ?? []).map((f) => f.nome)}

@@ -25,6 +25,8 @@ type Conta = {
   valor: number;
   vencimento: string;
   status: "aberta" | "paga";
+  parcela_numero: number | null;
+  compra: { num_parcelas: number } | null;
   pago_em: string | null;
   valor_pago: number | null;
   favorecido: { nome: string } | null;
@@ -32,7 +34,7 @@ type Conta = {
 };
 
 const COLUNAS =
-  "id, descricao, valor, vencimento, status, pago_em, valor_pago, favorecido:favorecidos(nome), categoria:categorias(nome)";
+  "id, descricao, valor, vencimento, status, pago_em, valor_pago, parcela_numero, favorecido:favorecidos(nome), categoria:categorias(nome), compra:compras(num_parcelas)";
 
 const DIAS_DA_SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
@@ -335,6 +337,11 @@ function TabelaDeContas({
                 </td>
                 <td className="larga">
                   {conta.descricao}
+                  {conta.parcela_numero && conta.compra && (
+                    <span className="etiqueta etiqueta-neutra etiqueta-parcela">
+                      parcela {conta.parcela_numero}/{conta.compra.num_parcelas}
+                    </span>
+                  )}
                   {detalhes && <span className="linha-detalhe">{detalhes}</span>}
                 </td>
                 <td className="direita numero">

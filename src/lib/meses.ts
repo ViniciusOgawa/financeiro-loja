@@ -66,3 +66,19 @@ export function semanasDoMes(mes: Mes): (number | null)[][] {
   }
   return semanas;
 }
+
+/** Soma dias a uma data "AAAA-MM-DD". */
+export function somarDias(data: string, dias: number): string {
+  const [ano, mes, dia] = data.split("-").map(Number);
+  return new Date(Date.UTC(ano, mes - 1, dia + dias)).toISOString().slice(0, 10);
+}
+
+/**
+ * Soma meses mantendo o dia. Se o mês de destino for mais curto, usa o
+ * último dia dele: 31/01 mais um mês vira 28/02 (ou 29/02).
+ */
+export function somarMeses(data: string, meses: number): string {
+  const [ano, mes, dia] = data.split("-").map(Number);
+  const destino = deslocarMes({ ano, mes }, meses);
+  return dataDoDia(destino, Math.min(dia, diasNoMes(destino)));
+}

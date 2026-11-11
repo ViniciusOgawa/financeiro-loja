@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { EstadoAcao } from "@/componentes/form-com-estado";
 import { dataValida, hoje, lerValor } from "@/lib/formato";
+import { MAXIMO_DE_PARCELAS } from "@/lib/parcelas";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { exigirUsuario } from "@/lib/usuario";
 
@@ -44,15 +45,63 @@ export async function criarConta(
   if (!campos.descricao) {
     return { erro: "Digite a descrição da conta.", campos };
   }
-  const valor = lerValor(campos.valor);
-  if (valor === null) {
-    return { erro: "Digite um valor válido, como 1.250,00.", campos };
+
+  // Uma conta simples tem uma única parcela, lida dos campos principais.
+  // Uma compra parcelada manda a data e o valor de cada parcela, já
+  // conferidos (e talvez ajustados) pela pessoa na prévia do formulário.
+  const quantidade = Number(texto(formData, "parcelas") || "1");
+  if (
+    !Number.isInteger(quantidade) ||
+    quantidade < 1 ||
+    quantidade > MAXIMO_DE_PARCELAS
+  ) {
+    return {
+      erro: `O número de parcelas deve ficar entre 1 e ${MAXIMO_DE_PARCELAS}.`,
+      campos,
+    };
   }
-  if (valor >= 10_000_000_000) {
+
+  const parcelas: { valor: number; vencimento: string }[] = [];
+  if (quantidade === 1) {
+    const valor = lerValor(campos.valor);
+    if (valor === null) {
+      return { erro: "Digite um valor válido, como 1.250,00.", campos };
+    }
+    if (!dataValida(campos.vencimento)) {
+      return { erro: "Escolha a data de vencimento.", campos };
+    }
+    parcelas.push({ valor, vencimento: campos.vencimento });
+  } else {
+    const valores = formData.getAll("parcela_valor").map(String);
+    const vencimentos = formData.getAll("parcela_vencimento").map(String);
+    if (valores.length !== quantidade || vencimentos.length !== quantidade) {
+      return {
+        erro: "Preencha o valor e o primeiro vencimento para gerar as parcelas.",
+        campos,
+      };
+    }
+    for (let indice = 0; indice < quantidade; indice++) {
+      const valor = lerValor(valores[indice]);
+      if (valor === null) {
+        return {
+          erro: `O valor da parcela ${indice + 1} não é válido.`,
+          campos,
+        };
+      }
+      if (!dataValida(vencimentos[indice])) {
+        return {
+          erro: `Escolha o vencimento da parcela ${indice + 1}.`,
+          campos,
+        };
+      }
+      parcelas.push({ valor, vencimento: vencimentos[indice] });
+    }
+  }
+
+  const total =
+    Math.round(parcelas.reduce((soma, p) => soma + p.valor, 0) * 100) / 100;
+  if (total >= 10_000_000_000) {
     return { erro: "O valor é alto demais.", campos };
-  }
-  if (!dataValida(campos.vencimento)) {
-    return { erro: "Escolha a data de vencimento.", campos };
   }
 
   const supabase = await criarClienteServidor();
@@ -88,25 +137,52 @@ export async function criarConta(
     }
   }
 
-  const { error } = await supabase.from("contas").insert({
+  const comum = {
     descricao: campos.descricao,
     favorecido_id: favorecidoId,
     categoria_id: campos.categoria_id || null,
-    valor,
-    vencimento: campos.vencimento,
-    observacao: campos.observacao || null,
-  });
+  };
+
+  // Compra parcelada: um registro da compra e uma conta para cada parcela.
+  let compraId: string | null = null;
+  if (parcelas.length > 1) {
+    const { data: compra, error: erroCompra } = await supabase
+      .from("compras")
+      .insert({ ...comum, valor_total: total, num_parcelas: parcelas.length })
+      .select("id")
+      .single();
+    if (erroCompra) {
+      return { erro: "Não foi possível salvar a compra. Tente de novo.", campos };
+    }
+    compraId = compra.id;
+  }
+
+  // As parcelas entram todas de uma vez: ou todas são gravadas, ou nenhuma.
+  const { error } = await supabase.from("contas").insert(
+    parcelas.map((parcela, indice) => ({
+      ...comum,
+      valor: parcela.valor,
+      vencimento: parcela.vencimento,
+      observacao: campos.observacao || null,
+      compra_id: compraId,
+      parcela_numero: compraId ? indice + 1 : null,
+    })),
+  );
   if (error) {
+    // Sem as parcelas, a compra ficaria solta no banco.
+    if (compraId) await supabase.from("compras").delete().eq("id", compraId);
     return { erro: "Não foi possível salvar a conta. Tente de novo.", campos };
   }
 
   revalidatePath("/");
   revalidatePath("/favorecidos");
-  // Volta para o mês em que a conta vence, para ela aparecer na tela.
+  // Volta para o mês do primeiro vencimento, para a conta aparecer na tela.
+  // Ao lançar outra, o número no endereço muda a cada vez, o que faz o
+  // formulário recomeçar vazio.
   redirect(
     formData.get("depois") === "outra"
-      ? "/contas/nova?salva=1"
-      : `/?mes=${campos.vencimento.slice(0, 7)}`,
+      ? `/contas/nova?salva=${Date.now()}`
+      : `/?mes=${parcelas[0].vencimento.slice(0, 7)}`,
   );
 }
 
