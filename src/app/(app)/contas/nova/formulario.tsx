@@ -7,11 +7,16 @@ import { criarConta, type EstadoConta } from "../actions";
 type Props = {
   categorias: { id: string; nome: string }[];
   favorecidos: string[];
+  vencimentoInicial: string;
 };
 
 const estadoInicial: EstadoConta = {};
 
-export function FormularioConta({ categorias, favorecidos }: Props) {
+export function FormularioConta({
+  categorias,
+  favorecidos,
+  vencimentoInicial,
+}: Props) {
   const [estado, acao, enviando] = useActionState(criarConta, estadoInicial);
   const campos = estado.campos;
 
@@ -59,7 +64,7 @@ export function FormularioConta({ categorias, favorecidos }: Props) {
             name="vencimento"
             type="date"
             className="entrada"
-            defaultValue={campos?.vencimento}
+            defaultValue={campos?.vencimento ?? vencimentoInicial}
             required
           />
         </div>

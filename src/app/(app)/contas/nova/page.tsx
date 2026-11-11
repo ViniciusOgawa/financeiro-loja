@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { dataValida } from "@/lib/formato";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { exigirUsuario } from "@/lib/usuario";
 import { FormularioConta } from "./formulario";
@@ -9,7 +10,10 @@ export default async function PaginaNovaConta({
   searchParams,
 }: PageProps<"/contas/nova">) {
   await exigirUsuario();
-  const { salva } = await searchParams;
+  const { salva, vencimento } = await searchParams;
+  // Vem preenchido quando a pessoa clica em Lançar conta com um dia aberto.
+  const vencimentoInicial =
+    typeof vencimento === "string" && dataValida(vencimento) ? vencimento : "";
 
   const supabase = await criarClienteServidor();
   const [categorias, favorecidos] = await Promise.all([
@@ -34,6 +38,7 @@ export default async function PaginaNovaConta({
       )}
 
       <FormularioConta
+        vencimentoInicial={vencimentoInicial}
         categorias={categorias.data ?? []}
         favorecidos={(favorecidos.data ?? []).map((f) => f.nome)}
       />

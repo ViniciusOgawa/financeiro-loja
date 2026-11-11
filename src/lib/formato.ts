@@ -58,3 +58,30 @@ export function hoje(): string {
     timeZone: "America/Sao_Paulo",
   }).format(new Date());
 }
+
+const moedaSemCentavos = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  maximumFractionDigits: 0,
+});
+
+/** Valor arredondado, para espaços pequenos como o calendário. */
+export function formatarMoedaCurta(valor: number): string {
+  return moedaSemCentavos.format(valor);
+}
+
+const numeroComCentavos = new Intl.NumberFormat("pt-BR", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+/** "1.234,56": o valor como a pessoa digitaria em um campo. */
+export function formatarValorDeCampo(valor: number): string {
+  return numeroComCentavos.format(valor);
+}
+
+/** "2026-11-15" vira "15/11". */
+export function formatarDiaMes(data: string): string {
+  const [, mes, dia] = data.split("-");
+  return `${dia}/${mes}`;
+}
