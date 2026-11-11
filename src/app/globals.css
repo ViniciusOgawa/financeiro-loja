@@ -1,0 +1,606 @@
+/*
+ * Tema visual: fontes do sistema e tons neutros com azul e verde de destaque,
+ * no mesmo espírito da interface do GitHub. Claro por padrão, escuro quando o
+ * computador estiver em modo escuro.
+ */
+
+:root {
+  --fonte: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
+    Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --fonte-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --fundo: #ffffff;
+  --fundo-suave: #f6f8fa;
+  --fundo-cabecalho: #f6f8fa;
+  --borda: #d1d9e0;
+  --borda-suave: #d1d9e0b3;
+
+  --texto: #1f2328;
+  --texto-suave: #59636e;
+  --texto-sobre-cor: #ffffff;
+
+  --azul: #0969da;
+  --azul-fundo: #ddf4ff;
+  --verde: #1a7f37;
+  --verde-botao: #1f883d;
+  --verde-botao-hover: #1c8139;
+  --verde-fundo: #dafbe1;
+  --vermelho: #d1242f;
+  --vermelho-fundo: #ffebe9;
+  --vermelho-borda: #ff818266;
+  --amarelo: #9a6700;
+  --amarelo-fundo: #fff8c5;
+  --amarelo-borda: #d4a72c66;
+
+  --botao-fundo: #f6f8fa;
+  --botao-fundo-hover: #eff2f5;
+  --foco: #0969da;
+  --sombra: 0 1px 0 #1f23280a;
+  --raio: 6px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #0d1117;
+    --fundo-suave: #151b23;
+    --fundo-cabecalho: #010409;
+    --borda: #3d444d;
+    --borda-suave: #3d444db3;
+
+    --texto: #f0f6fc;
+    --texto-suave: #9198a1;
+
+    --azul: #4493f8;
+    --azul-fundo: #388bfd1a;
+    --verde: #3fb950;
+    --verde-botao: #238636;
+    --verde-botao-hover: #29903b;
+    --verde-fundo: #2ea04326;
+    --vermelho: #f85149;
+    --vermelho-fundo: #f851491a;
+    --vermelho-borda: #f8514966;
+    --amarelo: #d29922;
+    --amarelo-fundo: #bb800926;
+    --amarelo-borda: #bb800966;
+
+    --botao-fundo: #212830;
+    --botao-fundo-hover: #262c36;
+    --foco: #1f6feb;
+    --sombra: 0 0 transparent;
+
+    color-scheme: dark;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: var(--fonte);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+a {
+  color: var(--azul);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: 2px;
+}
+
+.suave {
+  color: var(--texto-suave);
+}
+
+.numero {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Botões ---------- */
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+  padding: 0 1rem;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--botao-fundo);
+  color: var(--texto);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: var(--sombra);
+  white-space: nowrap;
+}
+
+.botao:hover {
+  background: var(--botao-fundo-hover);
+  text-decoration: none;
+}
+
+.botao:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.botao-principal {
+  border-color: transparent;
+  background: var(--verde-botao);
+  color: var(--texto-sobre-cor);
+}
+
+.botao-principal:hover {
+  background: var(--verde-botao-hover);
+}
+
+.botao-largo {
+  width: 100%;
+}
+
+/* ---------- Formulários ---------- */
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.campo label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.entrada {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--fundo);
+  color: var(--texto);
+  font: inherit;
+}
+
+.entrada:focus-visible {
+  border-color: var(--foco);
+  outline: 2px solid var(--foco);
+  outline-offset: -1px;
+}
+
+/* ---------- Caixas e avisos ---------- */
+
+.caixa {
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--fundo);
+}
+
+.caixa-cabecalho {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--borda);
+  border-radius: var(--raio) var(--raio) 0 0;
+  background: var(--fundo-suave);
+  font-weight: 600;
+}
+
+.caixa-corpo {
+  padding: 1rem;
+}
+
+.aviso {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  font-size: 0.9375rem;
+}
+
+.aviso-erro {
+  border-color: var(--vermelho-borda);
+  background: var(--vermelho-fundo);
+}
+
+.aviso-atencao {
+  border-color: var(--amarelo-borda);
+  background: var(--amarelo-fundo);
+}
+
+.aviso code {
+  font-family: var(--fonte-mono);
+  font-size: 0.875rem;
+}
+
+/* ---------- Estrutura das telas internas ---------- */
+
+.cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  min-height: 3.5rem;
+  padding: 0 1.5rem;
+  border-bottom: 1px solid var(--borda);
+  background: var(--fundo-cabecalho);
+}
+
+.cabecalho-marca {
+  color: var(--texto);
+  font-weight: 600;
+}
+
+.cabecalho-marca:hover {
+  text-decoration: none;
+}
+
+.cabecalho-usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+  font-size: 0.9375rem;
+}
+
+.pagina {
+  width: 100%;
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.pagina-titulo {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--borda-suave);
+}
+
+.vazio {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.vazio p {
+  max-width: 34rem;
+  margin: 0.5rem auto 0;
+  color: var(--texto-suave);
+}
+
+/* ---------- Tela de entrada ---------- */
+
+.entrar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 3rem 1rem;
+  background: var(--fundo-suave);
+}
+
+.entrar-titulo {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 300;
+  text-align: center;
+}
+
+.entrar-caixa {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 21rem;
+  padding: 1.25rem;
+}
+
+.entrar-rodape {
+  width: 100%;
+  max-width: 21rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.entrar .aviso {
+  width: 100%;
+  max-width: 21rem;
+  margin-bottom: 1rem;
+}
+
+/* ---------- Menu das seções ---------- */
+
+.menu {
+  display: flex;
+  align-self: stretch;
+  gap: 0.25rem;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+  border-bottom: 2px solid transparent;
+  color: var(--texto);
+  font-size: 0.9375rem;
+}
+
+.menu-item:hover {
+  background: var(--botao-fundo-hover);
+  text-decoration: none;
+}
+
+.menu-item[aria-current="page"] {
+  border-bottom-color: #fd8c73;
+  font-weight: 600;
+}
+
+/* ---------- Título com ação ao lado ---------- */
+
+.pagina-titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.pagina-estreita {
+  max-width: 44rem;
+}
+
+/* ---------- Tabelas ---------- */
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.tabela th,
+.tabela td {
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--borda-suave);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.tabela th {
+  background: var(--fundo-suave);
+  color: var(--texto-suave);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.tabela tr:last-child td {
+  border-bottom: 0;
+}
+
+.tabela tbody tr:hover {
+  background: var(--fundo-suave);
+}
+
+.tabela .direita {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tabela-rolagem {
+  overflow-x: auto;
+}
+
+/* ---------- Etiquetas de situação ---------- */
+
+.etiqueta {
+  display: inline-block;
+  padding: 0 0.5rem;
+  border: 1px solid var(--borda);
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.375rem;
+  white-space: nowrap;
+}
+
+.etiqueta-vermelha {
+  border-color: var(--vermelho-borda);
+  background: var(--vermelho-fundo);
+  color: var(--vermelho);
+}
+
+.etiqueta-amarela {
+  border-color: var(--amarelo-borda);
+  background: var(--amarelo-fundo);
+  color: var(--amarelo);
+}
+
+.etiqueta-neutra {
+  color: var(--texto-suave);
+}
+
+/* ---------- Resumo em números ---------- */
+
+.resumo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.resumo-item {
+  flex: 1 1 12rem;
+  padding: 0.75rem 1rem;
+}
+
+.resumo-item dt {
+  color: var(--texto-suave);
+  font-size: 0.8125rem;
+}
+
+.resumo-item dd {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.resumo-item .perigo {
+  color: var(--vermelho);
+}
+
+/* ---------- Formulários de página ---------- */
+
+.form-grade {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.form-grade .inteira {
+  grid-column: 1 / -1;
+}
+
+.form-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--borda-suave);
+}
+
+.campo .dica {
+  color: var(--texto-suave);
+  font-size: 0.8125rem;
+}
+
+textarea.entrada {
+  min-height: 4.5rem;
+  resize: vertical;
+}
+
+.form-erro {
+  flex-basis: 100%;
+  margin-top: 0.375rem;
+  color: var(--vermelho);
+  font-size: 0.875rem;
+}
+
+.form-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-linha .entrada {
+  flex: 1 1 12rem;
+  width: auto;
+}
+
+.acoes-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.botao-pequeno {
+  min-height: 1.875rem;
+  padding: 0 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.botao-perigo {
+  color: var(--vermelho);
+}
+
+.botao-perigo:hover {
+  border-color: transparent;
+  background: var(--vermelho);
+  color: var(--texto-sobre-cor);
+}
+
+.aviso-sucesso {
+  border-color: var(--verde);
+  background: var(--verde-fundo);
+}
+
+.espaco-abaixo {
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 40rem) {
+  .form-grade {
+    grid-template-columns: 1fr;
+  }
+
+  .cabecalho {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    padding: 0.5rem 1rem 0;
+  }
+
+  .menu {
+    order: 3;
+    flex-basis: 100%;
+    min-height: 2.5rem;
+  }
+}
+
+/* Coluna que ocupa o espaço que sobrar, deixando as ações compactas. */
+.tabela .larga {
+  width: 100%;
+}
+
+.acoes-linha {
+  flex-wrap: nowrap;
+}
+
+.acoes-linha form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.acoes-linha .form-erro {
+  width: 15rem;
+  text-align: right;
+}
