@@ -16,6 +16,7 @@ import {
   nomeMes,
   semanasDoMes,
 } from "@/lib/meses";
+import { gerarContasFixas } from "@/lib/recorrencias";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { exigirUsuario } from "@/lib/usuario";
 
@@ -26,6 +27,7 @@ type Conta = {
   vencimento: string;
   status: "aberta" | "paga";
   parcela_numero: number | null;
+  recorrencia_id: string | null;
   compra: { num_parcelas: number } | null;
   pago_em: string | null;
   valor_pago: number | null;
@@ -34,7 +36,7 @@ type Conta = {
 };
 
 const COLUNAS =
-  "id, descricao, valor, vencimento, status, pago_em, valor_pago, parcela_numero, favorecido:favorecidos(nome), categoria:categorias(nome), compra:compras(num_parcelas)";
+  "id, descricao, valor, vencimento, status, pago_em, valor_pago, parcela_numero, recorrencia_id, favorecido:favorecidos(nome), categoria:categorias(nome), compra:compras(num_parcelas)";
 
 const DIAS_DA_SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
@@ -61,6 +63,9 @@ export default async function PaginaDoMes({ searchParams }: PageProps<"/">) {
       : null;
 
   const supabase = await criarClienteServidor();
+  // Antes de listar, cria as contas fixas que ainda faltam neste mês.
+  await gerarContasFixas(supabase, mes, dataDeHoje);
+
   const [doMes, antigas] = await Promise.all([
     supabase
       .from("contas")
@@ -340,6 +345,11 @@ function TabelaDeContas({
                   {conta.parcela_numero && conta.compra && (
                     <span className="etiqueta etiqueta-neutra etiqueta-parcela">
                       parcela {conta.parcela_numero}/{conta.compra.num_parcelas}
+                    </span>
+                  )}
+                  {conta.recorrencia_id && (
+                    <span className="etiqueta etiqueta-neutra etiqueta-parcela">
+                      fixa
                     </span>
                   )}
                   {detalhes && <span className="linha-detalhe">{detalhes}</span>}

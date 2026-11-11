@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { EstadoAcao } from "@/componentes/form-com-estado";
+import { resolverFavorecido } from "@/lib/favorecidos";
 import { dataValida, hoje, lerValor } from "@/lib/formato";
 import { MAXIMO_DE_PARCELAS } from "@/lib/parcelas";
 import { criarClienteServidor } from "@/lib/supabase/server";
@@ -106,36 +107,9 @@ export async function criarConta(
 
   const supabase = await criarClienteServidor();
 
-  // O favorecido é digitado livremente: usa o cadastro existente com o mesmo
-  // nome (sem diferenciar maiúsculas) ou cria um novo na hora.
-  let favorecidoId: string | null = null;
-  if (campos.favorecido) {
-    const { data: existentes, error: erroBusca } = await supabase
-      .from("favorecidos")
-      .select("id, nome");
-    if (erroBusca) {
-      return { erro: "Não foi possível salvar. Tente de novo.", campos };
-    }
-
-    const procurado = campos.favorecido.toLocaleLowerCase("pt-BR");
-    const encontrado = existentes.find(
-      (f) => f.nome.toLocaleLowerCase("pt-BR") === procurado,
-    );
-
-    if (encontrado) {
-      favorecidoId = encontrado.id;
-    } else {
-      const { data: novo, error: erroNovo } = await supabase
-        .from("favorecidos")
-        .insert({ nome: campos.favorecido })
-        .select("id")
-        .single();
-      if (erroNovo) {
-        return { erro: "Não foi possível criar o favorecido.", campos };
-      }
-      favorecidoId = novo.id;
-    }
-  }
+  const favorecido = await resolverFavorecido(supabase, campos.favorecido);
+  if ("erro" in favorecido) return { erro: favorecido.erro, campos };
+  const favorecidoId = favorecido.id;
 
   const comum = {
     descricao: campos.descricao,

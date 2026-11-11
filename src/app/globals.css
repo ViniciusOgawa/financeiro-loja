@@ -891,3 +891,11 @@ a.dia-pago:hover {
   color: var(--texto-suave);
   font-size: 0.8125rem;
 }
+
+.espaco-acima {
+  margin-top: 1rem;
+}
+
+.sem-quebra {
+  white-space: nowrap;
+}

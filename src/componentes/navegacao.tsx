@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const itens = [
   { href: "/", rotulo: "Contas" },
+  { href: "/recorrencias", rotulo: "Contas fixas" },
   { href: "/favorecidos", rotulo: "Favorecidos" },
   { href: "/categorias", rotulo: "Categorias" },
 ];
