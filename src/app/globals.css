@@ -899,3 +899,12 @@ a.dia-pago:hover {
 .sem-quebra {
   white-space: nowrap;
 }
+
+.caixa-atencao {
+  border-color: var(--amarelo-borda);
+}
+
+.caixa-atencao > .caixa-cabecalho {
+  border-bottom-color: var(--amarelo-borda);
+  background: var(--amarelo-fundo);
+}

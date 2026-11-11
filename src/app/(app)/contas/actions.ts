@@ -148,7 +148,7 @@ export async function criarConta(
     return { erro: "Não foi possível salvar a conta. Tente de novo.", campos };
   }
 
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   revalidatePath("/favorecidos");
   // Volta para o mês do primeiro vencimento, para a conta aparecer na tela.
   // Ao lançar outra, o número no endereço muda a cada vez, o que faz o
@@ -156,7 +156,7 @@ export async function criarConta(
   redirect(
     formData.get("depois") === "outra"
       ? `/contas/nova?salva=${Date.now()}`
-      : `/?mes=${parcelas[0].vencimento.slice(0, 7)}`,
+      : `/mes?mes=${parcelas[0].vencimento.slice(0, 7)}`,
   );
 }
 
@@ -192,7 +192,7 @@ export async function pagarConta(
     .eq("status", "aberta");
   if (error) return { erro: "Não foi possível registrar o pagamento." };
 
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   return {};
 }
 
@@ -213,7 +213,7 @@ export async function desfazerPagamento(
     .eq("status", "paga");
   if (error) return { erro: "Não foi possível desfazer o pagamento." };
 
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   return {};
 }
 
@@ -234,6 +234,6 @@ export async function cancelarConta(
     .eq("status", "aberta");
   if (error) return { erro: "Não foi possível cancelar." };
 
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   return {};
 }

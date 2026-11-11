@@ -91,7 +91,7 @@ export async function salvarContaFixa(
     return { erro: "Não foi possível salvar. Tente de novo.", campos };
   }
 
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   revalidatePath("/recorrencias");
   revalidatePath("/favorecidos");
   redirect("/recorrencias");
@@ -134,7 +134,7 @@ export async function alternarContaFixa(
     .eq("id", id);
   if (error) return { erro: "Não foi possível salvar." };
 
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   revalidatePath("/recorrencias");
   return {};
 }
