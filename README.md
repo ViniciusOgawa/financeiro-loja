@@ -35,6 +35,22 @@ e demais despesas, com vencimentos, parcelas e contas que se repetem todo mês.
    usuário logado enxerga todos os dados.
 4. Ainda em **Authentication > Users**, crie os dois usuários (e-mail e senha).
 
+## Publicar na internet (Vercel)
+
+1. Crie uma conta em <https://vercel.com> entrando com o GitHub.
+2. Em **Add New > Project**, importe o repositório `financeiro-loja`. A Vercel
+   reconhece o Next.js sozinha; não mude os comandos de build.
+3. Antes de clicar em **Deploy**, abra **Environment Variables** e cadastre as
+   duas variáveis, com os mesmos valores do seu `.env`:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+4. Clique em **Deploy**. Ao terminar, a Vercel mostra o endereço do sistema.
+
+Depois disso, cada envio ao ramo `main` publica a nova versão sozinho.
+
+Use sempre a chave **publicável** do Supabase. A chave secreta
+(`service_role`) nunca deve ser cadastrada aqui.
+
 ## Estrutura
 
 | Caminho | Conteúdo |

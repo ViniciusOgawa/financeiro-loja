@@ -40,7 +40,7 @@ export function TabelaDeContas({
 }) {
   return (
     <div className="tabela-rolagem">
-      <table className="tabela">
+      <table className="tabela tabela-cartoes">
         <thead>
           <tr>
             <th>Vence</th>
@@ -60,12 +60,12 @@ export function TabelaDeContas({
 
             return (
               <tr key={conta.id}>
-                <td className="numero">
+                <td className="numero c-vence" data-rotulo="Vence">
                   {comAno
                     ? formatarData(conta.vencimento)
                     : formatarDiaMes(conta.vencimento)}
                 </td>
-                <td className="larga">
+                <td className="larga c-conta">
                   {conta.descricao}
                   {conta.parcela_numero && conta.compra && (
                     <span className="etiqueta etiqueta-neutra etiqueta-parcela">
@@ -79,7 +79,7 @@ export function TabelaDeContas({
                   )}
                   {detalhes && <span className="linha-detalhe">{detalhes}</span>}
                 </td>
-                <td className="direita numero">
+                <td className="direita numero c-valor">
                   {formatarMoeda(valor)}
                   {conta.status === "paga" && valorPago !== valor && (
                     <span className="linha-detalhe">
@@ -87,10 +87,10 @@ export function TabelaDeContas({
                     </span>
                   )}
                 </td>
-                <td>
+                <td className="c-situacao">
                   <Situacao conta={conta} dataDeHoje={dataDeHoje} />
                 </td>
-                <td>
+                <td className="c-acoes">
                   <AcoesConta
                     hoje={dataDeHoje}
                     conta={{

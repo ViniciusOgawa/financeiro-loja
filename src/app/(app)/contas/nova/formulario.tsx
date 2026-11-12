@@ -7,6 +7,7 @@ import {
   formatarMoeda,
   formatarValorDeCampo,
   lerValor,
+  mascararValor,
 } from "@/lib/formato";
 import {
   datasDasParcelas,
@@ -88,7 +89,7 @@ export function FormularioConta({
   );
 
   return (
-    <form action={acao} className="caixa caixa-corpo">
+    <form action={acao} className="caixa caixa-corpo" aria-busy={enviando}>
       {estado.erro && (
         <p className="aviso aviso-erro espaco-abaixo" role="alert">
           {estado.erro}
@@ -116,10 +117,12 @@ export function FormularioConta({
             id="valor"
             name="valor"
             className="entrada numero"
-            inputMode="decimal"
+            inputMode="numeric"
             placeholder="0,00"
             value={valor}
-            onChange={(evento) => aoMudarBase(setValor)(evento.target.value)}
+            onChange={(evento) =>
+              aoMudarBase(setValor)(mascararValor(evento.target.value))
+            }
             autoComplete="off"
             required
           />
@@ -248,11 +251,13 @@ export function FormularioConta({
                           <input
                             name="parcela_valor"
                             className="entrada numero"
-                            inputMode="decimal"
+                            inputMode="numeric"
                             aria-label={`Valor da parcela ${indice + 1}`}
                             value={parcela.valor}
                             onChange={(evento) =>
-                              ajustar(indice, { valor: evento.target.value })
+                              ajustar(indice, {
+                                valor: mascararValor(evento.target.value),
+                              })
                             }
                             autoComplete="off"
                             required

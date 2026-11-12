@@ -68,7 +68,7 @@ export default async function PaginaFavorecidos() {
 
       {favorecidos.length > 0 && (
         <section className="caixa tabela-rolagem">
-          <table className="tabela">
+          <table className="tabela tabela-cartoes">
             <thead>
               <tr>
                 <th>Nome</th>
@@ -78,7 +78,7 @@ export default async function PaginaFavorecidos() {
             <tbody>
               {favorecidos.map((favorecido) => (
                 <tr key={favorecido.id}>
-                  <td className="larga">
+                  <td className="larga c-inteira">
                     <FormComEstado
                       acao={renomearFavorecido}
                       className="form-linha"
@@ -102,7 +102,7 @@ export default async function PaginaFavorecidos() {
                       )}
                     </FormComEstado>
                   </td>
-                  <td>
+                  <td className="c-acoes">
                     <div className="acoes-linha">
                       <FormComEstado acao={alternarFavorecido}>
                         <input type="hidden" name="id" value={favorecido.id} />

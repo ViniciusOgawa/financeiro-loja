@@ -254,22 +254,20 @@ a:hover {
 /* ---------- Estrutura das telas internas ---------- */
 
 .cabecalho {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  min-height: 3.5rem;
-  padding: 0 1.5rem;
   border-bottom: 1px solid var(--borda);
   background: var(--fundo-cabecalho);
 }
 
-.cabecalho-marca {
-  color: var(--texto);
-  font-weight: 600;
-}
-
-.cabecalho-marca:hover {
-  text-decoration: none;
+/* Segue a largura e as margens de .pagina. */
+.cabecalho-dentro {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 76rem;
+  min-height: 3.5rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
 .cabecalho-usuario {
@@ -351,6 +349,8 @@ a:hover {
   display: flex;
   align-self: stretch;
   gap: 0.25rem;
+  /* O primeiro item encosta na margem do conteúdo. */
+  margin-left: -0.75rem;
 }
 
 .menu-item {
@@ -567,24 +567,6 @@ textarea.entrada {
   margin-bottom: 1rem;
 }
 
-@media (max-width: 40rem) {
-  .form-grade {
-    grid-template-columns: 1fr;
-  }
-
-  .cabecalho {
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
-    padding: 0.5rem 1rem 0;
-  }
-
-  .menu {
-    order: 3;
-    flex-basis: 100%;
-    min-height: 2.5rem;
-  }
-}
-
 /* Coluna que ocupa o espaço que sobrar, deixando as ações compactas. */
 .tabela .larga {
   width: 100%;
@@ -631,7 +613,7 @@ textarea.entrada {
 
 .mes-grade {
   display: grid;
-  grid-template-columns: minmax(0, 27rem) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 35rem) minmax(0, 1fr);
   align-items: start;
   gap: 1rem;
 }
@@ -691,25 +673,25 @@ textarea.entrada {
   border-bottom: 1px solid var(--borda);
   background: var(--fundo-suave);
   color: var(--texto-suave);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   text-align: center;
 }
 
 .calendario-cabecalho span {
-  padding: 0.375rem 0;
+  padding: 0.5rem 0;
 }
 
 .dia {
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
-  min-height: 4.25rem;
-  padding: 0.25rem 0.375rem;
+  min-height: 5.5rem;
+  padding: 0.375rem 0.5rem;
   border-right: 1px solid var(--borda-suave);
   border-bottom: 1px solid var(--borda-suave);
   color: var(--texto);
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
 }
 
 .calendario-semana > .dia:last-child {
@@ -731,9 +713,9 @@ a.dia:hover {
 
 .dia-numero {
   align-self: flex-start;
-  min-width: 1.5rem;
+  min-width: 1.75rem;
   border-radius: 2rem;
-  line-height: 1.5rem;
+  line-height: 1.75rem;
   text-align: center;
 }
 
@@ -746,7 +728,7 @@ a.dia:hover {
 .dia-info {
   display: flex;
   flex-direction: column;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.3;
   overflow-wrap: anywhere;
@@ -754,7 +736,7 @@ a.dia:hover {
 
 .dia-info small {
   color: var(--texto-suave);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 400;
 }
 
@@ -907,4 +889,342 @@ a.dia-pago:hover {
 .caixa-atencao > .caixa-cabecalho {
   border-bottom-color: var(--amarelo-borda);
   background: var(--amarelo-fundo);
+}
+
+/* ---------- Celular ---------- */
+
+/* Campos de data não podem alargar a grade em telas estreitas. */
+.entrada {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.cabecalho-usuario .suave {
+  overflow: hidden;
+  max-width: 12rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-item {
+  flex: none;
+  white-space: nowrap;
+}
+
+@media (max-width: 40rem) {
+  /* Cabeçalho em duas linhas: marca e Sair em cima, menu rolável embaixo. */
+  .cabecalho-dentro {
+    flex-wrap: wrap;
+    gap: 0 1rem;
+    min-height: 0;
+    padding: 0.5rem 1rem 0;
+  }
+
+  .menu {
+    order: 3;
+    flex-basis: 100%;
+    min-height: 2.75rem;
+    margin: 0 -1rem;
+    padding: 0 0.375rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .menu::-webkit-scrollbar {
+    display: none;
+  }
+
+  .menu-item {
+    padding: 0 0.625rem;
+  }
+
+  .pagina {
+    padding: 1rem;
+  }
+
+  h1 {
+    font-size: 1.375rem;
+  }
+
+  /* Botões maiores, mais fáceis de tocar. */
+  .botao {
+    min-height: 2.5rem;
+  }
+
+  .botao-pequeno {
+    min-height: 2.25rem;
+    padding: 0 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  .pagina-titulo > .botao,
+  .pagina-titulo > .form-linha,
+  .mes-navegacao {
+    width: 100%;
+  }
+
+  .pagina-titulo > .form-linha > .botao,
+  .form-acoes > .botao {
+    flex: 1 1 auto;
+  }
+
+  .mes-navegacao h1 {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .form-grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .janela-acoes {
+    flex-wrap: wrap;
+  }
+
+  .janela-acoes > .botao {
+    flex: 1 1 auto;
+  }
+
+  .vazio {
+    padding: 2rem 1rem;
+  }
+
+  /* Resumo: cada número em uma linha, com o rótulo à esquerda. */
+  .resumo {
+    gap: 0.5rem;
+  }
+
+  .resumo-item {
+    display: grid;
+    flex-basis: 100%;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 0.75rem;
+  }
+
+  .resumo-item dt {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .resumo-item .resumo-detalhe {
+    grid-row: 2;
+    grid-column: 1;
+  }
+
+  .resumo-item dd.numero {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    align-self: center;
+    font-size: 1.25rem;
+  }
+
+  /* Calendário: células menores, só com o valor em aberto. */
+  .dia {
+    align-items: center;
+    min-height: 3.5rem;
+    padding: 0.25rem 0.125rem;
+    font-size: 0.8125rem;
+  }
+
+  .dia-numero {
+    align-self: center;
+    min-width: 1.5rem;
+    line-height: 1.5rem;
+  }
+
+  .dia-info {
+    font-size: 0.625rem;
+    text-align: center;
+  }
+
+  .dia-info small {
+    display: none;
+  }
+
+  .tabela th,
+  .tabela td {
+    padding: 0.5rem 0.625rem;
+  }
+
+  /*
+   * Tabelas em cartões: cada linha vira um bloco, com a conta e o valor em
+   * cima, o vencimento e a situação no meio e os botões embaixo.
+   */
+  .tabela-cartoes,
+  .tabela-cartoes tbody {
+    display: block;
+  }
+
+  .tabela-cartoes thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .tabela-cartoes tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--borda-suave);
+  }
+
+  .tabela-cartoes tr:last-child {
+    border-bottom: 0;
+  }
+
+  .tabela-cartoes td {
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+
+  .tabela-cartoes .c-conta {
+    order: 1;
+    width: auto;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .tabela-cartoes .c-conta .linha-detalhe {
+    font-weight: 400;
+  }
+
+  .tabela-cartoes .c-valor {
+    order: 2;
+    align-self: start;
+    font-weight: 600;
+  }
+
+  .tabela-cartoes .c-vence {
+    order: 3;
+    color: var(--texto-suave);
+    font-size: 0.875rem;
+  }
+
+  .tabela-cartoes .c-situacao {
+    order: 4;
+    justify-self: end;
+  }
+
+  .tabela-cartoes .c-periodo {
+    order: 5;
+    grid-column: 1 / -1;
+    color: var(--texto-suave);
+    font-size: 0.875rem;
+  }
+
+  .tabela-cartoes .c-acoes,
+  .tabela-cartoes .c-inteira {
+    order: 6;
+    grid-column: 1 / -1;
+    width: auto;
+  }
+
+  .tabela-cartoes td[data-rotulo]::before {
+    content: attr(data-rotulo) " ";
+  }
+
+  .tabela-cartoes .acoes-linha {
+    justify-content: flex-start;
+  }
+
+  .tabela-cartoes .acoes-linha > form {
+    align-items: flex-start;
+  }
+
+  .tabela-cartoes .acoes-linha .form-erro {
+    width: auto;
+    text-align: left;
+  }
+}
+
+/* ---------- Carregamento ---------- */
+
+.so-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Rodinha dentro do botão enquanto o formulário é enviado. */
+form[aria-busy="true"] button[type="submit"],
+.botao[aria-busy="true"] {
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+form[aria-busy="true"] button[type="submit"]::before,
+.botao[aria-busy="true"]::before {
+  flex: none;
+  width: 0.875em;
+  height: 0.875em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  content: "";
+  animation: girar 0.6s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Barra no topo enquanto a próxima tela é buscada no servidor. */
+.progresso {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.progresso::before {
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: var(--azul);
+  content: "";
+}
+
+/* O atraso evita que a barra pisque quando a tela chega rápido. */
+.progresso-ativo {
+  opacity: 1;
+  transition: opacity 0.1s linear 0.12s;
+}
+
+.progresso-ativo::before {
+  animation: progresso 1s ease-in-out infinite;
+}
+
+@keyframes progresso {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(250%);
+  }
+}
+
+/* A tela antiga fica esmaecida até a nova chegar. */
+.pagina {
+  transition: opacity 0.15s linear;
+}
+
+.progresso-ativo ~ .pagina {
+  opacity: 0.5;
+  transition-delay: 0.12s;
 }

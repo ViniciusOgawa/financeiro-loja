@@ -80,6 +80,18 @@ export function formatarValorDeCampo(valor: number): string {
   return numeroComCentavos.format(valor);
 }
 
+/**
+ * Máscara do campo de valor: fica só com os algarismos e trata os dois
+ * últimos como centavos, do jeito de um caixa eletrônico. Digitar 1, 2, 5, 0
+ * mostra "0,01", "0,12", "1,25" e "12,50". Vazio continua vazio.
+ */
+export function mascararValor(texto: string): string {
+  // Doze algarismos: até R$ 9.999.999.999,99, o limite aceito ao salvar.
+  const algarismos = texto.replace(/\D/g, "").replace(/^0+/, "").slice(0, 12);
+  if (!algarismos) return "";
+  return formatarValorDeCampo(Number(algarismos) / 100);
+}
+
 /** "2026-11-15" vira "15/11". */
 export function formatarDiaMes(data: string): string {
   const [, mes, dia] = data.split("-");

@@ -3,8 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Financeiro da loja",
-    template: "%s · Financeiro da loja",
+    default: "Harmonia",
+    template: "%s · Harmonia",
   },
   description: "Controle de contas a pagar da loja.",
   robots: { index: false, follow: false },

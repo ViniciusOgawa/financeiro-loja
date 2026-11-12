@@ -65,7 +65,7 @@ export default async function PaginaCategorias() {
 
       {categorias.length > 0 && (
         <section className="caixa tabela-rolagem">
-          <table className="tabela">
+          <table className="tabela tabela-cartoes">
             <thead>
               <tr>
                 <th>Nome</th>
@@ -75,7 +75,7 @@ export default async function PaginaCategorias() {
             <tbody>
               {categorias.map((categoria) => (
                 <tr key={categoria.id}>
-                  <td className="larga">
+                  <td className="larga c-inteira">
                     <FormComEstado
                       acao={renomearCategoria}
                       className="form-linha"
@@ -94,7 +94,7 @@ export default async function PaginaCategorias() {
                       </button>
                     </FormComEstado>
                   </td>
-                  <td>
+                  <td className="c-acoes">
                     <div className="acoes-linha">
                       <FormComEstado acao={excluirCategoria}>
                         <input type="hidden" name="id" value={categoria.id} />

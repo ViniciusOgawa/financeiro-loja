@@ -16,7 +16,7 @@ export function FormularioEntrada({ desligado }: { desligado: boolean }) {
         </p>
       )}
 
-      <form action={acao} className="caixa entrar-caixa">
+      <form action={acao} className="caixa entrar-caixa" aria-busy={enviando}>
         <div className="campo">
           <label htmlFor="email">E-mail</label>
           <input

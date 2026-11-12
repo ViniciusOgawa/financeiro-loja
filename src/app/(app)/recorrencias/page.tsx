@@ -88,7 +88,7 @@ export default async function PaginaContasFixas() {
           </dl>
 
           <section className="caixa tabela-rolagem">
-            <table className="tabela">
+            <table className="tabela tabela-cartoes">
               <thead>
                 <tr>
                   <th>Vence</th>
@@ -106,22 +106,24 @@ export default async function PaginaContasFixas() {
                     .join(" · ");
                   return (
                     <tr key={fixa.id}>
-                      <td className="numero sem-quebra">Dia {fixa.dia_vencimento}</td>
-                      <td className="larga">
+                      <td className="numero sem-quebra c-vence">
+                        Dia {fixa.dia_vencimento}
+                      </td>
+                      <td className="larga c-conta">
                         {fixa.descricao}
                         {detalhes && (
                           <span className="linha-detalhe">{detalhes}</span>
                         )}
                       </td>
-                      <td className="direita numero">
+                      <td className="direita numero c-valor">
                         {formatarMoeda(Number(fixa.valor))}
                       </td>
-                      <td className="numero sem-quebra">
+                      <td className="numero sem-quebra c-periodo">
                         {fixa.fim
                           ? `${mesAno(fixa.inicio)} a ${mesAno(fixa.fim)}`
                           : `Desde ${mesAno(fixa.inicio)}`}
                       </td>
-                      <td>
+                      <td className="c-situacao">
                         {fixa.ativa ? (
                           <span className="etiqueta etiqueta-verde">Ativa</span>
                         ) : (
@@ -130,7 +132,7 @@ export default async function PaginaContasFixas() {
                           </span>
                         )}
                       </td>
-                      <td>
+                      <td className="c-acoes">
                         <div className="acoes-linha">
                           <Link
                             href={`/recorrencias/${fixa.id}`}

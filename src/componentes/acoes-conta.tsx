@@ -10,6 +10,7 @@ import {
   formatarData,
   formatarMoeda,
   formatarValorDeCampo,
+  mascararValor,
 } from "@/lib/formato";
 import type { EstadoAcao } from "./form-com-estado";
 
@@ -88,8 +89,11 @@ export function AcoesConta({ conta, hoje }: Props) {
               id={`valor-pago-${conta.id}`}
               name="valor_pago"
               className="entrada numero"
-              inputMode="decimal"
+              inputMode="numeric"
               defaultValue={formatarValorDeCampo(conta.valor)}
+              onChange={(evento) => {
+                evento.target.value = mascararValor(evento.target.value);
+              }}
               autoComplete="off"
               required
             />
@@ -156,7 +160,7 @@ function Janela({
       </button>
 
       <dialog ref={janela} className="janela" aria-label={titulo}>
-        <form action={enviar}>
+        <form action={enviar} aria-busy={enviando}>
           <div className="caixa-cabecalho">{titulo}</div>
           <div className="caixa-corpo janela-corpo">
             {children}

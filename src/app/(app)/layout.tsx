@@ -1,5 +1,7 @@
-import Link from "next/link";
+import { Suspense } from "react";
+import { BotaoEnviar } from "@/componentes/botao-enviar";
 import { Navegacao } from "@/componentes/navegacao";
+import { ProgressoDaNavegacao } from "@/componentes/progresso-da-navegacao";
 import { exigirUsuario } from "@/lib/usuario";
 import { sair } from "../login/actions";
 
@@ -11,20 +13,21 @@ export default async function LayoutInterno({ children }: LayoutProps<"/">) {
 
   return (
     <>
+      <Suspense>
+        <ProgressoDaNavegacao />
+      </Suspense>
+
       <header className="cabecalho">
-        <Link href="/" className="cabecalho-marca">
-          Financeiro da loja
-        </Link>
+        {/* Mesma largura da página, para o menu e o Sair alinharem ao conteúdo. */}
+        <div className="cabecalho-dentro">
+          <Navegacao />
 
-        <Navegacao />
-
-        <div className="cabecalho-usuario">
-          <span className="suave">{usuario.nome}</span>
-          <form action={sair}>
-            <button type="submit" className="botao">
-              Sair
-            </button>
-          </form>
+          <div className="cabecalho-usuario">
+            <span className="suave">{usuario.nome}</span>
+            <form action={sair}>
+              <BotaoEnviar>Sair</BotaoEnviar>
+            </form>
+          </div>
         </div>
       </header>
 

@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Entrar" };
 export default function PaginaEntrada() {
   return (
     <main className="entrar">
-      <h1 className="entrar-titulo">Financeiro da loja</h1>
+      <h1 className="entrar-titulo">Harmonia</h1>
 
       {!supabaseConfigurado && (
         <p className="aviso aviso-atencao">

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { mascararValor } from "@/lib/formato";
 import {
   salvarContaFixa,
   type CamposFixa,
@@ -32,7 +33,7 @@ export function FormularioContaFixa({
   const campos = estado.campos ?? inicial;
 
   return (
-    <form action={acao} className="caixa caixa-corpo">
+    <form action={acao} className="caixa caixa-corpo" aria-busy={enviando}>
       {id && <input type="hidden" name="id" value={id} />}
 
       {estado.erro && (
@@ -62,9 +63,12 @@ export function FormularioContaFixa({
             id="valor"
             name="valor"
             className="entrada numero"
-            inputMode="decimal"
+            inputMode="numeric"
             placeholder="0,00"
             defaultValue={campos.valor}
+            onChange={(evento) => {
+              evento.target.value = mascararValor(evento.target.value);
+            }}
             autoComplete="off"
             required
           />
