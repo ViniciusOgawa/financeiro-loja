@@ -1,7 +1,7 @@
 import { AcoesConta } from "@/componentes/acoes-conta";
 import { formatarData, formatarDiaMes, formatarMoeda } from "@/lib/formato";
 
-// Lista de contas usada na tela inicial e na tela do mês.
+// Lista de boletos usada na tela inicial e na tela do mês.
 
 export type Conta = {
   id: string;
@@ -10,23 +10,35 @@ export type Conta = {
   vencimento: string;
   status: "aberta" | "paga";
   parcela_numero: number | null;
-  recorrencia_id: string | null;
   compra: { num_parcelas: number } | null;
   pago_em: string | null;
   valor_pago: number | null;
   favorecido: { nome: string } | null;
-  categoria: { nome: string } | null;
+  observacao: string | null;
 };
 
 /** Colunas a pedir ao banco para montar uma `Conta`. */
 export const COLUNAS_DA_CONTA =
-  "id, descricao, valor, vencimento, status, pago_em, valor_pago, parcela_numero, recorrencia_id, favorecido:favorecidos(nome), categoria:categorias(nome), compra:compras(num_parcelas)";
+  "id, descricao, valor, vencimento, status, pago_em, valor_pago, parcela_numero, observacao, favorecido:favorecidos(nome), compra:compras(num_parcelas)";
 
 export const somarContas = (contas: Conta[]) =>
   contas.reduce((total, conta) => total + Number(conta.valor), 0);
 
 export function pluralDeContas(quantidade: number): string {
-  return quantidade === 1 ? "1 conta" : `${quantidade} contas`;
+  return quantidade === 1 ? "1 boleto" : `${quantidade} boletos`;
+}
+
+/** Nome mostrado na lista: o beneficiário, ou a descrição nos boletos sem ele. */
+export function nomeDaConta(conta: Conta): string {
+  return conta.favorecido?.nome ?? conta.descricao;
+}
+
+/**
+ * Texto secundário: só a observação. A descrição dos boletos antigos guarda o
+ * nome digitado antes do cadastro de beneficiários e não aparece mais.
+ */
+function detalhesDaConta(conta: Conta): string {
+  return conta.observacao ?? "";
 }
 
 export function TabelaDeContas({
@@ -44,7 +56,7 @@ export function TabelaDeContas({
         <thead>
           <tr>
             <th>Vence</th>
-            <th>Conta</th>
+            <th>Beneficiário</th>
             <th className="direita">Valor</th>
             <th>Situação</th>
             <th className="direita">Ações</th>
@@ -54,9 +66,8 @@ export function TabelaDeContas({
           {contas.map((conta) => {
             const valor = Number(conta.valor);
             const valorPago = Number(conta.valor_pago ?? valor);
-            const detalhes = [conta.favorecido?.nome, conta.categoria?.nome]
-              .filter(Boolean)
-              .join(" · ");
+            const nome = nomeDaConta(conta);
+            const detalhes = detalhesDaConta(conta);
 
             return (
               <tr key={conta.id}>
@@ -66,15 +77,10 @@ export function TabelaDeContas({
                     : formatarDiaMes(conta.vencimento)}
                 </td>
                 <td className="larga c-conta">
-                  {conta.descricao}
+                  {nome}
                   {conta.parcela_numero && conta.compra && (
                     <span className="etiqueta etiqueta-neutra etiqueta-parcela">
                       parcela {conta.parcela_numero}/{conta.compra.num_parcelas}
-                    </span>
-                  )}
-                  {conta.recorrencia_id && (
-                    <span className="etiqueta etiqueta-neutra etiqueta-parcela">
-                      fixa
                     </span>
                   )}
                   {detalhes && <span className="linha-detalhe">{detalhes}</span>}
@@ -95,7 +101,7 @@ export function TabelaDeContas({
                     hoje={dataDeHoje}
                     conta={{
                       id: conta.id,
-                      descricao: conta.descricao,
+                      descricao: nome,
                       valor,
                       vencimento: conta.vencimento,
                       paga: conta.status === "paga",

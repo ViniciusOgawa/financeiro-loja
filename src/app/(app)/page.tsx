@@ -7,8 +7,7 @@ import {
   type Conta,
 } from "@/componentes/tabela-de-contas";
 import { formatarData, formatarMoeda, hoje } from "@/lib/formato";
-import { lerMes, somarDias } from "@/lib/meses";
-import { gerarContasFixas } from "@/lib/recorrencias";
+import { somarDias } from "@/lib/meses";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { exigirUsuario } from "@/lib/usuario";
 
@@ -21,9 +20,6 @@ export default async function PaginaInicial() {
   const limite = somarDias(dataDeHoje, DIAS_A_FRENTE);
 
   const supabase = await criarClienteServidor();
-  // Os próximos dias podem cair no mês seguinte, então as contas fixas são
-  // geradas até o mês da data limite.
-  await gerarContasFixas(supabase, lerMes(limite.slice(0, 7), dataDeHoje), dataDeHoje);
 
   const { data, error } = await supabase
     .from("contas")
@@ -50,14 +46,14 @@ export default async function PaginaInicial() {
             Ver o mês
           </Link>
           <Link href="/contas/nova" className="botao botao-principal">
-            Lançar conta
+            Lançar boleto
           </Link>
         </div>
       </div>
 
       {error && (
         <p className="aviso aviso-erro espaco-abaixo" role="alert">
-          Não foi possível carregar as contas.
+          Não foi possível carregar os boletos.
         </p>
       )}
 
@@ -85,7 +81,7 @@ export default async function PaginaInicial() {
         <section className="caixa vazio">
           <h2>Tudo em dia</h2>
           <p>
-            Não há contas atrasadas nem vencendo até{" "}
+            Não há boletos atrasados nem vencendo até{" "}
             {formatarData(limite)}.
           </p>
         </section>

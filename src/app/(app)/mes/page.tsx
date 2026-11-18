@@ -1,5 +1,10 @@
 import Link from "next/link";
 import {
+  itensDaPagina,
+  lerPagina,
+  Paginacao,
+} from "@/componentes/paginacao";
+import {
   COLUNAS_DA_CONTA as COLUNAS,
   pluralDeContas as plural,
   somarContas as somar,
@@ -21,7 +26,6 @@ import {
   nomeMes,
   semanasDoMes,
 } from "@/lib/meses";
-import { gerarContasFixas } from "@/lib/recorrencias";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { exigirUsuario } from "@/lib/usuario";
 
@@ -47,8 +51,6 @@ export default async function PaginaDoMes({ searchParams }: PageProps<"/mes">) {
       : null;
 
   const supabase = await criarClienteServidor();
-  // Antes de listar, cria as contas fixas que ainda faltam neste mês.
-  await gerarContasFixas(supabase, mes, dataDeHoje);
 
   const [doMes, antigas] = await Promise.all([
     supabase
@@ -86,6 +88,11 @@ export default async function PaginaDoMes({ searchParams }: PageProps<"/mes">) {
     ? (porDia.get(diaSelecionado) ?? [])
     : contas;
   const enderecoDoMes = `/mes?mes=${chave}`;
+  const pagina = lerPagina(primeiro(parametros.pagina), listadas.length);
+  const enderecoDaPagina = (numero: number) =>
+    `${enderecoDoMes}${diaSelecionado ? `&dia=${diaSelecionado}` : ""}${
+      numero > 1 ? `&pagina=${numero}` : ""
+    }`;
   const lancar = diaSelecionado
     ? `/contas/nova?vencimento=${dataDoDia(mes, diaSelecionado)}`
     : "/contas/nova";
@@ -116,7 +123,7 @@ export default async function PaginaDoMes({ searchParams }: PageProps<"/mes">) {
           )}
         </div>
         <Link href={lancar} className="botao botao-principal">
-          Lançar conta
+          Lançar boleto
         </Link>
       </div>
 
@@ -197,13 +204,13 @@ export default async function PaginaDoMes({ searchParams }: PageProps<"/mes">) {
             {diaSelecionado ? (
               <>
                 <span>
-                  Contas do dia{" "}
+                  Boletos do dia{" "}
                   {formatarData(dataDoDia(mes, diaSelecionado))}
                 </span>
                 <Link href={enderecoDoMes}>Ver o mês inteiro</Link>
               </>
             ) : (
-              <span>Contas do mês</span>
+              <span>Boletos do mês</span>
             )}
           </div>
 
@@ -211,15 +218,25 @@ export default async function PaginaDoMes({ searchParams }: PageProps<"/mes">) {
             <div className="vazio">
               <h2>
                 {diaSelecionado
-                  ? "Nenhuma conta neste dia"
-                  : "Nenhuma conta neste mês"}
+                  ? "Nenhum boleto neste dia"
+                  : "Nenhum boleto neste mês"}
               </h2>
               <p>
-                Use o botão Lançar conta para registrar um boleto ou despesa.
+                Use o botão Lançar boleto para registrar um boleto.
               </p>
             </div>
           ) : (
-            <TabelaDeContas contas={listadas} dataDeHoje={dataDeHoje} />
+            <>
+              <TabelaDeContas
+                contas={itensDaPagina(listadas, pagina)}
+                dataDeHoje={dataDeHoje}
+              />
+              <Paginacao
+                pagina={pagina}
+                total={listadas.length}
+                endereco={enderecoDaPagina}
+              />
+            </>
           )}
         </section>
       </div>

@@ -1,7 +1,7 @@
-# Financeiro da loja
+# Harmonia
 
-Controle de contas a pagar da loja: boletos de fornecedores, salários, aluguel
-e demais despesas, com vencimentos, parcelas e contas que se repetem todo mês.
+Controle dos boletos a pagar da loja: vencimentos, parcelas, pagamentos e
+relatórios por beneficiário (semana, mês e ano).
 
 ## Tecnologia
 
@@ -28,8 +28,12 @@ e demais despesas, com vencimentos, parcelas e contas que se repetem todo mês.
 ## Preparar o Supabase (uma única vez)
 
 1. Crie um projeto em <https://supabase.com>.
-2. No **SQL Editor**, cole e execute o conteúdo de
-   [`supabase/migrations/0001_esquema_inicial.sql`](supabase/migrations/0001_esquema_inicial.sql).
+2. No **SQL Editor**, cole e execute, nesta ordem, o conteúdo de cada arquivo
+   de [`supabase/migrations`](supabase/migrations):
+   - `0001_esquema_inicial.sql`: cria as tabelas.
+   - `0002_beneficiario_da_descricao.sql`: passa para o cadastro de
+     beneficiários os nomes digitados na descrição dos boletos antigos. Num
+     banco novo, não faz nada.
 3. Em **Authentication**, desligue a opção que permite novos cadastros
    ("Allow new users to sign up"). O sistema não tem tela de cadastro, e todo
    usuário logado enxerga todos os dados.
@@ -62,3 +66,8 @@ Use sempre a chave **publicável** do Supabase. A chave secreta
 | `src/proxy.ts` | Renova a sessão e barra quem não está logado |
 | `src/app/globals.css` | Cores, fontes e componentes visuais |
 | `supabase/migrations` | Esquema do banco de dados |
+
+No banco, os beneficiários ficam na tabela `favorecidos` e os boletos na
+tabela `contas`. As tabelas `categorias` e `recorrencias` e a coluna
+`descricao` são de versões anteriores: continuam guardadas, mas o sistema não
+as usa mais.

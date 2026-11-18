@@ -3,16 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { EstadoAcao } from "@/componentes/form-com-estado";
-import { resolverFavorecido } from "@/lib/favorecidos";
+import { resolverBeneficiario } from "@/lib/beneficiarios";
 import { dataValida, hoje, lerValor } from "@/lib/formato";
 import { MAXIMO_DE_PARCELAS } from "@/lib/parcelas";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { exigirUsuario } from "@/lib/usuario";
 
 export type CamposConta = {
-  descricao: string;
-  favorecido: string;
-  categoria_id: string;
+  beneficiario: string;
   valor: string;
   vencimento: string;
   observacao: string;
@@ -35,16 +33,14 @@ export async function criarConta(
   await exigirUsuario();
 
   const campos: CamposConta = {
-    descricao: texto(formData, "descricao").replace(/\s+/g, " "),
-    favorecido: texto(formData, "favorecido").replace(/\s+/g, " "),
-    categoria_id: texto(formData, "categoria_id"),
+    beneficiario: texto(formData, "beneficiario").replace(/\s+/g, " "),
     valor: texto(formData, "valor"),
     vencimento: texto(formData, "vencimento"),
     observacao: texto(formData, "observacao"),
   };
 
-  if (!campos.descricao) {
-    return { erro: "Digite a descrição da conta.", campos };
+  if (!campos.beneficiario) {
+    return { erro: "Digite o beneficiário do boleto.", campos };
   }
 
   // Uma conta simples tem uma única parcela, lida dos campos principais.
@@ -107,14 +103,14 @@ export async function criarConta(
 
   const supabase = await criarClienteServidor();
 
-  const favorecido = await resolverFavorecido(supabase, campos.favorecido);
-  if ("erro" in favorecido) return { erro: favorecido.erro, campos };
-  const favorecidoId = favorecido.id;
+  const beneficiario = await resolverBeneficiario(supabase, campos.beneficiario);
+  if ("erro" in beneficiario) return { erro: beneficiario.erro, campos };
 
+  // A descrição deixou de ser digitada; guarda o nome do beneficiário, como
+  // nos boletos lançados antes da mudança.
   const comum = {
-    descricao: campos.descricao,
-    favorecido_id: favorecidoId,
-    categoria_id: campos.categoria_id || null,
+    descricao: beneficiario.nome,
+    favorecido_id: beneficiario.id,
   };
 
   // Compra parcelada: um registro da compra e uma conta para cada parcela.
@@ -149,7 +145,7 @@ export async function criarConta(
   }
 
   revalidatePath("/", "layout");
-  revalidatePath("/favorecidos");
+  revalidatePath("/beneficiarios");
   // Volta para o mês do primeiro vencimento, para a conta aparecer na tela.
   // Ao lançar outra, o número no endereço muda a cada vez, o que faz o
   // formulário recomeçar vazio.
@@ -236,4 +232,97 @@ export async function cancelarConta(
 
   revalidatePath("/", "layout");
   return {};
+}
+
+export type CamposEdicao = {
+  beneficiario: string;
+  valor: string;
+  vencimento: string;
+  observacao: string;
+  pago_em: string;
+  valor_pago: string;
+};
+
+export type EstadoEdicao = {
+  erro?: string;
+  campos?: CamposEdicao;
+};
+
+/**
+ * Corrige um boleto já lançado. Numa compra parcelada, muda só esta parcela.
+ * Num boleto pago, também permite corrigir a data e o valor do pagamento.
+ */
+export async function editarConta(
+  _anterior: EstadoEdicao,
+  formData: FormData,
+): Promise<EstadoEdicao> {
+  await exigirUsuario();
+  const id = texto(formData, "id");
+  const paga = formData.get("paga") === "true";
+  const campos: CamposEdicao = {
+    beneficiario: texto(formData, "beneficiario").replace(/\s+/g, " "),
+    valor: texto(formData, "valor"),
+    vencimento: texto(formData, "vencimento"),
+    observacao: texto(formData, "observacao"),
+    pago_em: texto(formData, "pago_em"),
+    valor_pago: texto(formData, "valor_pago"),
+  };
+
+  if (!id) return { erro: "Não foi possível salvar. Tente de novo.", campos };
+  if (!campos.beneficiario) {
+    return { erro: "Digite o beneficiário do boleto.", campos };
+  }
+  const valor = lerValor(campos.valor);
+  if (valor === null || valor >= 10_000_000_000) {
+    return { erro: "Digite um valor válido, como 1.250,00.", campos };
+  }
+  if (!dataValida(campos.vencimento)) {
+    return { erro: "Escolha a data de vencimento.", campos };
+  }
+
+  let pagamento = {};
+  if (paga) {
+    const valorPago = lerValor(campos.valor_pago);
+    if (!dataValida(campos.pago_em)) {
+      return { erro: "Escolha a data do pagamento.", campos };
+    }
+    if (campos.pago_em > hoje()) {
+      return { erro: "A data do pagamento não pode ser no futuro.", campos };
+    }
+    if (valorPago === null || valorPago >= 10_000_000_000) {
+      return { erro: "Digite um valor pago válido, como 1.250,00.", campos };
+    }
+    pagamento = { pago_em: campos.pago_em, valor_pago: valorPago };
+  }
+
+  const supabase = await criarClienteServidor();
+  const beneficiario = await resolverBeneficiario(supabase, campos.beneficiario);
+  if ("erro" in beneficiario) return { erro: beneficiario.erro, campos };
+
+  const { data, error } = await supabase
+    .from("contas")
+    .update({
+      descricao: beneficiario.nome,
+      favorecido_id: beneficiario.id,
+      valor,
+      vencimento: campos.vencimento,
+      observacao: campos.observacao || null,
+      ...pagamento,
+    })
+    .eq("id", id)
+    .eq("status", paga ? "paga" : "aberta")
+    .select("id");
+  if (error) {
+    return { erro: "Não foi possível salvar. Tente de novo.", campos };
+  }
+  if (!data?.length) {
+    // Alguém pagou, desfez ou cancelou o boleto enquanto a tela estava aberta.
+    return {
+      erro: "Este boleto mudou de situação. Volte e abra a edição de novo.",
+      campos,
+    };
+  }
+
+  revalidatePath("/", "layout");
+  redirect(`/mes?mes=${campos.vencimento.slice(0, 7)}`);
 }

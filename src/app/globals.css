@@ -611,17 +611,11 @@ textarea.entrada {
   color: var(--verde);
 }
 
+/* Calendário em cima, ocupando a largura toda, e a lista de boletos embaixo. */
 .mes-grade {
   display: grid;
-  grid-template-columns: minmax(0, 35rem) minmax(0, 1fr);
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
-}
-
-@media (max-width: 68rem) {
-  .mes-grade {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 .lista-cabecalho {
@@ -1227,4 +1221,220 @@ form[aria-busy="true"] button[type="submit"]::before,
 .progresso-ativo ~ .pagina {
   opacity: 0.5;
   transition-delay: 0.12s;
+}
+
+/* ---------- Relatórios ---------- */
+
+/* Cores das situações no gráfico (paleta de status, igual nos dois temas). */
+:root {
+  --grafico-pago: #0ca30c;
+  --grafico-a-vencer: #8c959f;
+  --grafico-atrasado: #d03b3b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --grafico-a-vencer: #656c76;
+  }
+}
+
+.amostra {
+  display: inline-block;
+  flex: none;
+  width: 0.625rem;
+  height: 0.625rem;
+  margin-right: 0.375rem;
+  border-radius: 2px;
+  vertical-align: baseline;
+}
+
+.amostra-pago {
+  background: var(--grafico-pago);
+}
+
+.amostra-aVencer {
+  background: var(--grafico-a-vencer);
+}
+
+.amostra-atrasado {
+  background: var(--grafico-atrasado);
+}
+
+/* Botões Semana / Mês / Ano, grudados como no GitHub. */
+.seletor {
+  display: inline-flex;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  overflow: hidden;
+}
+
+.seletor-item {
+  display: flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0 1rem;
+  background: var(--botao-fundo);
+  color: var(--texto);
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.seletor-item + .seletor-item {
+  border-left: 1px solid var(--borda);
+}
+
+.seletor-item:hover {
+  background: var(--botao-fundo-hover);
+  text-decoration: none;
+}
+
+.seletor-item[aria-current="page"] {
+  background: var(--azul);
+  color: var(--texto-sobre-cor);
+}
+
+.legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  padding: 0;
+  color: var(--texto-suave);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  list-style: none;
+}
+
+.legenda li {
+  display: flex;
+  align-items: center;
+}
+
+.grafico {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  list-style: none;
+}
+
+.grafico-linha {
+  display: grid;
+  grid-template-columns: minmax(6rem, 14rem) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9375rem;
+}
+
+.grafico-nome {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grafico-trilho {
+  display: block;
+}
+
+/* Partes separadas por um vão de 2px; só as pontas da barra são arredondadas. */
+.grafico-barra {
+  display: flex;
+  gap: 2px;
+  min-width: 4px;
+  height: 1rem;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.grafico-parte {
+  flex-basis: 0;
+  min-width: 2px;
+}
+
+.grafico-valor {
+  min-width: 7.5rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+@media (max-width: 40rem) {
+  .pagina-titulo > .seletor {
+    width: 100%;
+  }
+
+  .seletor-item {
+    flex: 1;
+    justify-content: center;
+    min-height: 2.5rem;
+  }
+
+  /* Nome e valor em cima, barra embaixo. */
+  .grafico-linha {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.25rem 0.75rem;
+  }
+
+  .grafico-trilho {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .grafico-valor {
+    min-width: 0;
+  }
+}
+
+/* ---------- Paginação ---------- */
+
+.paginacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--borda);
+  font-size: 0.875rem;
+}
+
+.paginacao-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.paginacao-numero {
+  min-width: 2rem;
+  padding: 0 0.5rem;
+}
+
+.paginacao-numero[aria-current="page"] {
+  border-color: transparent;
+  background: var(--azul);
+  color: var(--texto-sobre-cor);
+}
+
+.paginacao .botao[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.paginacao-buraco {
+  padding: 0 0.25rem;
+  color: var(--texto-suave);
+}
+
+@media (max-width: 40rem) {
+  .paginacao {
+    justify-content: center;
+  }
+}
+
+/* Contagem de boletos na lista de beneficiários: mesma largura em todas as
+   linhas, para os campos de nome ficarem alinhados. */
+.contagem {
+  flex: none;
+  width: 5.5rem;
+  text-align: right;
 }

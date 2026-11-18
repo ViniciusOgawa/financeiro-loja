@@ -5,32 +5,9 @@ import type { EstadoAcao } from "@/componentes/form-com-estado";
 import { criarClienteServidor } from "./supabase/server";
 import { exigirUsuario } from "./usuario";
 
-// Ações das telas de Favorecidos e Categorias. As duas tabelas têm a mesma
-// forma básica (id e nome único), então compartilham a mesma lógica.
+// Ações da tela de Beneficiários. No banco, a tabela se chama "favorecidos".
 
-type Cadastro = {
-  tabela: "favorecidos" | "categorias";
-  caminho: string;
-  // Usados nas mensagens: "Já existe um favorecido com esse nome."
-  um: string;
-  esteEmUso: string;
-};
-
-const FAVORECIDOS: Cadastro = {
-  tabela: "favorecidos",
-  caminho: "/favorecidos",
-  um: "um favorecido",
-  esteEmUso:
-    "Este favorecido tem contas lançadas e não pode ser excluído. Use Desativar.",
-};
-
-const CATEGORIAS: Cadastro = {
-  tabela: "categorias",
-  caminho: "/categorias",
-  um: "uma categoria",
-  esteEmUso: "Esta categoria tem contas lançadas e não pode ser excluída.",
-};
-
+const CAMINHO = "/beneficiarios";
 const NOME_DUPLICADO = "23505";
 const REGISTRO_EM_USO = "23503";
 const ERRO_GENERICO = "Não foi possível salvar. Tente de novo.";
@@ -41,27 +18,51 @@ function lerNome(formData: FormData): string {
     .replace(/\s+/g, " ");
 }
 
-async function criar(cadastro: Cadastro, formData: FormData): Promise<EstadoAcao> {
+/** Procura um beneficiário com o mesmo nome, sem diferenciar maiúsculas. */
+async function nomeEmUso(
+  supabase: Awaited<ReturnType<typeof criarClienteServidor>>,
+  nome: string,
+  outroQue?: string,
+): Promise<boolean> {
+  const { data } = await supabase.from("favorecidos").select("id, nome");
+  const procurado = nome.toLocaleLowerCase("pt-BR");
+  return (data ?? []).some(
+    (beneficiario) =>
+      beneficiario.id !== outroQue &&
+      beneficiario.nome.toLocaleLowerCase("pt-BR") === procurado,
+  );
+}
+
+export async function criarBeneficiario(
+  _: EstadoAcao,
+  formData: FormData,
+): Promise<EstadoAcao> {
   await exigirUsuario();
   const nome = lerNome(formData);
   if (!nome) return { erro: "Digite o nome." };
 
   const supabase = await criarClienteServidor();
-  const { error } = await supabase.from(cadastro.tabela).insert({ nome });
+  if (await nomeEmUso(supabase, nome)) {
+    return { erro: "Já existe um beneficiário com esse nome." };
+  }
+  const { error } = await supabase.from("favorecidos").insert({ nome });
   if (error) {
     return {
       erro:
         error.code === NOME_DUPLICADO
-          ? `Já existe ${cadastro.um} com esse nome.`
+          ? "Já existe um beneficiário com esse nome."
           : ERRO_GENERICO,
     };
   }
 
-  revalidatePath(cadastro.caminho);
+  revalidatePath(CAMINHO);
   return {};
 }
 
-async function renomear(cadastro: Cadastro, formData: FormData): Promise<EstadoAcao> {
+export async function renomearBeneficiario(
+  _: EstadoAcao,
+  formData: FormData,
+): Promise<EstadoAcao> {
   await exigirUsuario();
   const id = String(formData.get("id") ?? "");
   const nome = lerNome(formData);
@@ -69,54 +70,52 @@ async function renomear(cadastro: Cadastro, formData: FormData): Promise<EstadoA
   if (!nome) return { erro: "O nome não pode ficar vazio." };
 
   const supabase = await criarClienteServidor();
+  if (await nomeEmUso(supabase, nome, id)) {
+    return { erro: "Já existe um beneficiário com esse nome." };
+  }
   const { error } = await supabase
-    .from(cadastro.tabela)
+    .from("favorecidos")
     .update({ nome })
     .eq("id", id);
   if (error) {
     return {
       erro:
         error.code === NOME_DUPLICADO
-          ? `Já existe ${cadastro.um} com esse nome.`
+          ? "Já existe um beneficiário com esse nome."
           : ERRO_GENERICO,
     };
   }
 
-  revalidatePath(cadastro.caminho);
+  // O nome aparece nas listas de boletos e nos relatórios.
+  revalidatePath("/", "layout");
   return {};
 }
 
-async function excluir(cadastro: Cadastro, formData: FormData): Promise<EstadoAcao> {
+export async function excluirBeneficiario(
+  _: EstadoAcao,
+  formData: FormData,
+): Promise<EstadoAcao> {
   await exigirUsuario();
   const id = String(formData.get("id") ?? "");
   if (!id) return { erro: ERRO_GENERICO };
 
   const supabase = await criarClienteServidor();
-  const { error } = await supabase.from(cadastro.tabela).delete().eq("id", id);
+  const { error } = await supabase.from("favorecidos").delete().eq("id", id);
   if (error) {
     return {
-      erro: error.code === REGISTRO_EM_USO ? cadastro.esteEmUso : ERRO_GENERICO,
+      erro:
+        error.code === REGISTRO_EM_USO
+          ? "Este beneficiário tem boletos lançados e não pode ser excluído. Use Desativar."
+          : ERRO_GENERICO,
     };
   }
 
-  revalidatePath(cadastro.caminho);
+  revalidatePath(CAMINHO);
   return {};
 }
 
-export async function criarFavorecido(_: EstadoAcao, formData: FormData) {
-  return criar(FAVORECIDOS, formData);
-}
-
-export async function renomearFavorecido(_: EstadoAcao, formData: FormData) {
-  return renomear(FAVORECIDOS, formData);
-}
-
-export async function excluirFavorecido(_: EstadoAcao, formData: FormData) {
-  return excluir(FAVORECIDOS, formData);
-}
-
-/** Favorecido desativado some das sugestões ao lançar, mas mantém o histórico. */
-export async function alternarFavorecido(
+/** Beneficiário desativado some das sugestões ao lançar, mas mantém o histórico. */
+export async function alternarBeneficiario(
   _: EstadoAcao,
   formData: FormData,
 ): Promise<EstadoAcao> {
@@ -132,18 +131,6 @@ export async function alternarFavorecido(
     .eq("id", id);
   if (error) return { erro: ERRO_GENERICO };
 
-  revalidatePath("/favorecidos");
+  revalidatePath(CAMINHO);
   return {};
-}
-
-export async function criarCategoria(_: EstadoAcao, formData: FormData) {
-  return criar(CATEGORIAS, formData);
-}
-
-export async function renomearCategoria(_: EstadoAcao, formData: FormData) {
-  return renomear(CATEGORIAS, formData);
-}
-
-export async function excluirCategoria(_: EstadoAcao, formData: FormData) {
-  return excluir(CATEGORIAS, formData);
 }

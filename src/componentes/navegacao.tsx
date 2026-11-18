@@ -7,9 +7,8 @@ import { useEffect, useRef } from "react";
 const itens = [
   { href: "/", rotulo: "Início" },
   { href: "/mes", rotulo: "Mês" },
-  { href: "/recorrencias", rotulo: "Contas fixas" },
-  { href: "/favorecidos", rotulo: "Favorecidos" },
-  { href: "/categorias", rotulo: "Categorias" },
+  { href: "/relatorios", rotulo: "Relatórios" },
+  { href: "/beneficiarios", rotulo: "Beneficiários" },
 ];
 
 export function Navegacao() {

@@ -19,8 +19,7 @@ import {
 import { criarConta, type EstadoConta } from "../actions";
 
 type Props = {
-  categorias: { id: string; nome: string }[];
-  favorecidos: string[];
+  beneficiarios: string[];
   vencimentoInicial: string;
 };
 
@@ -29,11 +28,7 @@ type Ajuste = { valor?: string; vencimento?: string };
 
 const estadoInicial: EstadoConta = {};
 
-export function FormularioConta({
-  categorias,
-  favorecidos,
-  vencimentoInicial,
-}: Props) {
+export function FormularioConta({ beneficiarios, vencimentoInicial }: Props) {
   const [estado, acao, enviando] = useActionState(criarConta, estadoInicial);
   const campos = estado.campos;
 
@@ -98,17 +93,28 @@ export function FormularioConta({
 
       <div className="form-grade">
         <div className="campo inteira">
-          <label htmlFor="descricao">Descrição</label>
+          <label htmlFor="beneficiario">Beneficiário</label>
           <input
-            id="descricao"
-            name="descricao"
+            id="beneficiario"
+            name="beneficiario"
             className="entrada"
-            placeholder="Ex.: Boleto coleção de verão"
-            defaultValue={campos?.descricao}
-            maxLength={160}
+            list="lista-beneficiarios"
+            placeholder="Quem emitiu o boleto"
+            defaultValue={campos?.beneficiario}
+            maxLength={120}
+            autoComplete="off"
             autoFocus
             required
           />
+          <datalist id="lista-beneficiarios">
+            {beneficiarios.map((nome) => (
+              <option key={nome} value={nome} />
+            ))}
+          </datalist>
+          <span className="dica">
+            Comece a digitar para escolher um já cadastrado. Se o nome for
+            novo, ele é cadastrado sozinho.
+          </span>
         </div>
 
         <div className="campo">
@@ -162,7 +168,7 @@ export function FormularioConta({
             required
           />
           <span className="dica">
-            Deixe 1 para uma conta só. Acima disso, o sistema cria uma conta
+            Deixe 1 para um boleto só. Acima disso, o sistema cria um boleto
             para cada parcela.
           </span>
         </div>
@@ -282,48 +288,6 @@ export function FormularioConta({
           </div>
         )}
 
-        <div className="campo">
-          <label htmlFor="favorecido">Favorecido</label>
-          <input
-            id="favorecido"
-            name="favorecido"
-            className="entrada"
-            list="lista-favorecidos"
-            defaultValue={campos?.favorecido}
-            maxLength={120}
-            autoComplete="off"
-          />
-          <datalist id="lista-favorecidos">
-            {favorecidos.map((nome) => (
-              <option key={nome} value={nome} />
-            ))}
-          </datalist>
-          <span className="dica">
-            Para quem é o pagamento. Se o nome for novo, ele é cadastrado
-            sozinho.
-          </span>
-        </div>
-
-        <div className="campo">
-          <label htmlFor="categoria_id">Categoria</label>
-          {/* A chave recria o campo após um erro; sem ela, a categoria
-              escolhida voltaria para "Sem categoria". */}
-          <select
-            key={campos?.categoria_id ?? ""}
-            id="categoria_id"
-            name="categoria_id"
-            className="entrada"
-            defaultValue={campos?.categoria_id ?? ""}
-          >
-            <option value="">Sem categoria</option>
-            {categorias.map((categoria) => (
-              <option key={categoria.id} value={categoria.id}>
-                {categoria.nome}
-              </option>
-            ))}
-          </select>
-        </div>
-
         <div className="campo inteira">
           <label htmlFor="observacao">Observação (opcional)</label>
           <textarea
@@ -351,7 +315,7 @@ export function FormularioConta({
           className="botao"
           disabled={enviando}
         >
-          Salvar e lançar outra
+          Salvar e lançar outro
         </button>
         <Link href="/" className="botao">
           Voltar

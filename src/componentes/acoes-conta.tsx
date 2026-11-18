@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useRef, type ReactNode } from "react";
 import {
   cancelarConta,
@@ -40,9 +41,16 @@ export function AcoesConta({ conta, hoje }: Props) {
     </p>
   );
 
+  const editar = (
+    <Link href={`/contas/${conta.id}`} className="botao botao-pequeno">
+      Editar
+    </Link>
+  );
+
   if (conta.paga) {
     return (
       <div className="acoes-linha">
+        {editar}
         <Janela
           key="desfazer"
           rotulo="Desfazer"
@@ -52,7 +60,7 @@ export function AcoesConta({ conta, hoje }: Props) {
         >
           <input type="hidden" name="id" value={conta.id} />
           {resumo}
-          <p>A conta volta a aparecer como em aberto.</p>
+          <p>O boleto volta a aparecer como em aberto.</p>
         </Janela>
       </div>
     );
@@ -104,18 +112,20 @@ export function AcoesConta({ conta, hoje }: Props) {
         </p>
       </Janela>
 
+      {editar}
+
       <Janela
         key="cancelar"
         rotulo="Cancelar"
-        titulo="Cancelar conta"
+        titulo="Cancelar boleto"
         acao={cancelarConta}
-        confirmar="Cancelar esta conta"
+        confirmar="Cancelar este boleto"
         perigo
       >
         <input type="hidden" name="id" value={conta.id} />
         {resumo}
         <p>
-          A conta sai da lista e dos totais. Use para lançamentos feitos por
+          O boleto sai da lista e dos totais. Use para lançamentos feitos por
           engano ou boletos que não serão pagos.
         </p>
       </Janela>
