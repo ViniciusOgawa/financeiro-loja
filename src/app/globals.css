@@ -1438,3 +1438,47 @@ form[aria-busy="true"] button[type="submit"]::before,
   width: 5.5rem;
   text-align: right;
 }
+
+/* ---------- Busca de beneficiário ---------- */
+
+.combo {
+  position: relative;
+}
+
+.combo-lista {
+  position: absolute;
+  z-index: 20;
+  top: 100%;
+  right: 0;
+  left: 0;
+  max-height: 17rem;
+  margin: 0.25rem 0 0;
+  padding: 0.25rem;
+  overflow-y: auto;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--fundo);
+  box-shadow: 0 8px 24px #1f232826;
+  list-style: none;
+}
+
+.combo-opcao {
+  padding: 0.375rem 0.625rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.combo-opcao[aria-selected="true"] {
+  background: var(--azul-fundo);
+}
+
+.combo-novo {
+  padding: 0.375rem 0.625rem;
+  color: var(--texto-suave);
+  font-size: 0.875rem;
+}
+
+.combo-opcao + .combo-novo {
+  margin-top: 0.25rem;
+  border-top: 1px solid var(--borda-suave);
+}

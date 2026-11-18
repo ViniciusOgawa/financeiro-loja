@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CampoBeneficiario } from "@/componentes/campo-beneficiario";
 import { useActionState } from "react";
 import { mascararValor } from "@/lib/formato";
 import { editarConta, type CamposEdicao, type EstadoEdicao } from "../actions";
@@ -61,21 +62,12 @@ export function FormularioEdicao({
       <div className="form-grade">
         <div className="campo inteira">
           <label htmlFor="beneficiario">Beneficiário</label>
-          <input
+          <CampoBeneficiario
             id="beneficiario"
             name="beneficiario"
-            className="entrada"
-            list="lista-beneficiarios"
+            opcoes={beneficiarios}
             defaultValue={campos.beneficiario}
-            maxLength={120}
-            autoComplete="off"
-            required
           />
-          <datalist id="lista-beneficiarios">
-            {beneficiarios.map((nome) => (
-              <option key={nome} value={nome} />
-            ))}
-          </datalist>
         </div>
 
         <div className="campo">
